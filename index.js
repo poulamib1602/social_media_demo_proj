@@ -26,6 +26,6 @@ app.use('/api/auth',authRouter);
 
 
 app.listen(port, () => {
-    logger.info(`Server kkkk is running on port ${port}`);
+    logger.info(`Server is running on port ${port}`);
     
 });
