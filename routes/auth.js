@@ -2,6 +2,7 @@ const router = require('express').Router();
 const logger = require('../logger');
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const response = require('../response'); 
 
 router.post("/register", async (req, res) => {
     try {
@@ -14,9 +15,9 @@ router.post("/register", async (req, res) => {
             password: hashedPassword,
         });
         const user = await newUser.save();
-        res.status(200).json(user);
+        return response.success(res,user)
     } catch (error) {
-        res.status(500).json(error)
+      return response.error(res, error, 500);
     }
 });
 
@@ -27,10 +28,9 @@ router.post("/login", async (req, res) => {
   
       const validPassword = await bcrypt.compare(req.body.password, user.password)
       !validPassword && res.status(400).json("wrong password")
-  
-      res.status(200).json("Login sucessfully")
+      return response.success(res,"Login sucessfully");
     } catch (error) {
-      res.status(500).json(error)
+      return response.error(res, error, 500);
     }
   });
 module.exports = router
