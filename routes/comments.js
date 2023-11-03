@@ -1,31 +1,26 @@
 const express = require('express');
 const Comment = require('../models/comment');
 const commentsRouter = express.Router();
+const response = require('../response'); 
 
-
-
-commentsRouter.get("/", async (req, res) => {
-  try {
-    const comments = await Comment.find();
-    res.json(comments);
-  } catch (error) {
-    res.status(500).json({ error: 'Could not fetch comments' });
-  }
+commentsRouter.get('/:postId', async (req, res) => {
+    const { postId } = req.params;
+    const comments = await Comment.find({ postId, parentCommentId: null });
+    response.success(res,comments);
 });
 
-commentsRouter.post("/", async (req, res) => {
-  const { text } = req.body;
-  if (!text) {
-    return res.status(400).json({ error: 'Text is required' });
-  }
+commentsRouter.post('/', async (req, res) => {
+    const { text, author, postId } = req.body;
+    const comment = new Comment({ text, author, postId });
+    await comment.save();
+    response.success(res,comment);
+});
 
-  try {
-    const newComment = new Comment({ text });
-    await newComment.save();
-    res.status(201).json(newComment);
-  } catch (error) {
-    res.status(500).json({ error: 'Could not create a comment' });
-  }
+commentsRouter.post('/replies', async (req, res) => {
+    const { text, author, parentCommentId } = req.body;
+    const comment = new Comment({ text, author, parentCommentId });
+    await comment.save();
+    response.success(res,comment);
 });
 
 module.exports = commentsRouter;
